@@ -1,6 +1,7 @@
 package remoteppt.aman.desktopapp;
 
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -183,9 +184,8 @@ class PhotoViewer
 						BufferedImage image = ImageIO.read(new File(path));
 						ImageIcon icon = new ImageIcon(image);
 						
-						BufferedImage bimg = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.SCALE_SMOOTH);
-						Graphics2D g = bimg.createGraphics();
-						label.setIcon(icon);
+						Image img = icon.getImage().getScaledInstance(label.getWidth(), label.getHeight(), BufferedImage.SCALE_SMOOTH);
+						label.setIcon(new ImageIcon(img));
 						
 					}
 					catch(IOException ex)
