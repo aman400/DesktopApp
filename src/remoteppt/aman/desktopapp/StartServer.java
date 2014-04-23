@@ -1,4 +1,5 @@
 package remoteppt.aman.desktopapp;
+/** This code starts Server to display presentation. */
 
 import java.awt.TextArea;
 import java.io.BufferedReader;

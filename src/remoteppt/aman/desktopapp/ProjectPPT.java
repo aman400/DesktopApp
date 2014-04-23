@@ -78,6 +78,8 @@ public class ProjectPPT
 		frame.dispose();
 	}
 	
+	
+	// Receive file from network
 	public void recieveFile(String path, long length)
 	{
 		long receivedLength = 0;
@@ -86,11 +88,13 @@ public class ProjectPPT
 		byte[] buffer = new byte[1000];
 	
 		try
-		{			
+		{	
+			// Delete existing directories
 			if(new File(path).exists())new File(path).delete();
 			
 			FileOutputStream fos = new FileOutputStream(path);
-				
+			
+			// Read data from network and write to file
 			while((count = dis.read(buffer)) != -1)
 			{				
 				fos.write(buffer, 0, count);
@@ -109,6 +113,7 @@ public class ProjectPPT
 		}
 	}
 	
+	// update progress bar
 	public void setProgressBarValue(long value)
 	{
 		int length = (int)((value * 100)/maximumLength);
@@ -116,36 +121,37 @@ public class ProjectPPT
 		this.progressBar.setString(Integer.toString(progressBar.getValue())+"% Completed");
 	}
 	
-	 public void setLabel(String path)
-	 {
-		 try
-		 {
-			 BufferedImage buff = ImageIO.read(new File(path));
-			 ImageIcon img = new ImageIcon(buff);
-			 Image image = img.getImage().getScaledInstance(label.getWidth(), label.getHeight(), BufferedImage.SCALE_SMOOTH);
-			 label.setIcon(new ImageIcon(image));			 
-		 }
-		 catch(IOException exception)
-		 {
-			 exception.printStackTrace();
-		 }
-	 }
+	// Display Slides
+	public void setLabel(String path)
+	{
+		try
+		{
+			BufferedImage buff = ImageIO.read(new File(path));
+			ImageIcon img = new ImageIcon(buff);
+			Image image = img.getImage().getScaledInstance(label.getWidth(), label.getHeight(), BufferedImage.SCALE_SMOOTH);
+			label.setIcon(new ImageIcon(image));			 
+		}
+		catch(IOException exception)
+		{
+			exception.printStackTrace();
+		}
+	}
 	 
-	 // Extract presentation
-	 public void extractFiles(File file, File extractionPath, String name)
-	 {
-		 try
-		 {
-			 Thread th = new Thread(new ZipExtractor(file.getAbsolutePath(), extractionPath.getAbsolutePath()));
-			 th.start();
-			 th.join();
-			 
-			 // Get slides for presentation
-			 File[] presentation = new File(extractionPath.getAbsolutePath() + File.separatorChar + name).listFiles();
+	// Extract presentations to the given directory
+	public void extractFiles(File file, File extractionPath, String name)
+	{
+		try
+		{
+			Thread th = new Thread(new ZipExtractor(file.getAbsolutePath(), extractionPath.getAbsolutePath()));
+			th.start();
+			th.join();
+			
+			// Get slides for presentation
+			File[] presentation = new File(extractionPath.getAbsolutePath() + File.separatorChar + name).listFiles();
 		
-			 this.slides = new ArrayList<File>();
-			 for(File slide: presentation)
-				 slides.add(slide);
+			this.slides = new ArrayList<File>();
+			for(File slide: presentation)
+				slides.add(slide);
 			 
 			// Display First Slide
 			setLabel(slides.get(0).getAbsolutePath());

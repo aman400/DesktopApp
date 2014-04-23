@@ -1,6 +1,7 @@
+/** This code creates presentations which can be transfered to phone that can be displayed.*/
+
 package remoteppt.aman.desktopapp;
 
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
