@@ -185,6 +185,7 @@ class PhotoViewer
 						
 						BufferedImage bimg = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.SCALE_SMOOTH);
 						Graphics2D g = bimg.createGraphics();
+						label.setIcon(icon);
 						
 					}
 					catch(IOException ex)
