@@ -1,11 +1,14 @@
 package remoteppt.aman.desktopapp;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -115,7 +118,17 @@ public class ProjectPPT
 	
 	 public void setLabel(String path)
 	 {
-		 label.setIcon(new ImageIcon(path));
+		 try
+		 {
+			 BufferedImage buff = ImageIO.read(new File(path));
+			 ImageIcon img = new ImageIcon(buff);
+			 Image image = img.getImage().getScaledInstance(label.getWidth(), label.getHeight(), BufferedImage.SCALE_SMOOTH);
+			 label.setIcon(new ImageIcon(image));			 
+		 }
+		 catch(IOException exception)
+		 {
+			 exception.printStackTrace();
+		 }
 	 }
 	 
 	 // Extract presentation
