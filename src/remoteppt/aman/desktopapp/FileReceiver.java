@@ -23,6 +23,7 @@ public class FileReceiver implements Runnable
 			this.buffer =  new byte[1000];
 			this.count = 0;
 		}
+		
 		catch(IOException exception)
 		{
 			exception.printStackTrace();
@@ -43,6 +44,7 @@ public class FileReceiver implements Runnable
 			}
 			fos.close();
 		}
+		
 		catch(IOException ex)
 		{
 			ex.printStackTrace();

@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -25,7 +26,9 @@ public class ProjectPPT
 	private long maximumLength;
 	private final int WIDTH = 1000;
 	private final int HEIGHT = 1000;
-	private ArrayList<File> slides;
+	private ArrayList<String> slides;
+	private int index = 0;
+	private File receivedFileExtractionDirectory;
 	
 	ProjectPPT(DataInputStream dis)
 	{
@@ -33,7 +36,7 @@ public class ProjectPPT
 		this.frame = new JFrame();
 		this.panel = new JPanel();
 		this.label = new JLabel();
-		label.setBounds(0, 40, WIDTH, HEIGHT);
+		label.setBounds(0, 0, WIDTH, HEIGHT);
 		
 		setupGUI();
 	}
@@ -113,6 +116,17 @@ public class ProjectPPT
 		}
 	}
 	
+	public void incrementIndex()
+	{
+		index++;
+		setLabel();
+	}
+	
+	public void decrementIndex()
+	{
+		index--;
+		setLabel();
+	}
 	// update progress bar
 	public void setProgressBarValue(long value)
 	{
@@ -122,19 +136,32 @@ public class ProjectPPT
 	}
 	
 	// Display Slides
-	public void setLabel(String path)
+	public void setLabel()
 	{
+		if(progressBar.isVisible())
+		{
+			progressBar.setVisible(false);
+		}
+		
 		try
 		{
-			BufferedImage buff = ImageIO.read(new File(path));
+			File slide = new File(receivedFileExtractionDirectory.getAbsolutePath() + File.separatorChar + index);
+			BufferedImage buff = ImageIO.read(slide);
 			ImageIcon img = new ImageIcon(buff);
 			Image image = img.getImage().getScaledInstance(label.getWidth(), label.getHeight(), BufferedImage.SCALE_SMOOTH);
 			label.setIcon(new ImageIcon(image));			 
 		}
+		
+		catch(IIOException ex)
+		{
+			ex.printStackTrace();
+		}
+		
 		catch(IOException exception)
 		{
 			exception.printStackTrace();
 		}
+		
 	}
 	 
 	// Extract presentations to the given directory
@@ -146,19 +173,28 @@ public class ProjectPPT
 			th.start();
 			th.join();
 			
+			receivedFileExtractionDirectory = new File(extractionPath.getAbsolutePath() + File.separatorChar + name);
+			
 			// Get slides for presentation
-			File[] presentation = new File(extractionPath.getAbsolutePath() + File.separatorChar + name).listFiles();
+			String[] presentation = receivedFileExtractionDirectory.list();
 		
-			this.slides = new ArrayList<File>();
-			for(File slide: presentation)
-				slides.add(slide);
+			this.slides = new ArrayList<String>();
+			for(int i = 0; i < presentation.length; i++)
+			{
+				slides.add(receivedFileExtractionDirectory.getAbsolutePath() + File.separatorChar + i);
+			}
 			 
 			// Display First Slide
-			setLabel(slides.get(0).getAbsolutePath());
-		 }
-		 catch(InterruptedException ex)
-		 {
-			 ex.printStackTrace();
-		 }
+			setLabel();
+		}
+		
+		catch(ArrayIndexOutOfBoundsException exception)
+		{
+			exception.printStackTrace();
+		}
+		catch(InterruptedException ex)
+		{
+			ex.printStackTrace();
+		}
 	 }
 }

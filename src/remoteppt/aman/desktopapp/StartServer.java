@@ -8,6 +8,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,6 +16,7 @@ import java.net.SocketException;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 
 class Server
@@ -39,8 +41,12 @@ class Server
 	
 	// set components size and bounds
 	jf.setSize(250, 400);
+	
 	title.setBounds(10, 10, 100, 10);
-	output.setBounds(10, 50, 200, 300);
+	output.setBounds(10, 30, 230, 330);
+	
+	jf.setLocation(900, 300);
+	jf.setResizable(false);
 	
 	// add components to Frame
 	this.jf.add(this.title);
@@ -69,6 +75,11 @@ class Server
 				new Thread(new Receive(sock, output, send)).start();
 		    }
 	    }
+    	catch(BindException ex)
+    	{
+    		JOptionPane.showMessageDialog(jf, "Server Already Running!!!");
+    		jf.dispose();
+    	}
     	catch(SocketException ex)
     	{
     		ex.printStackTrace();
@@ -114,6 +125,7 @@ class Send implements Runnable
 	public void run()
 	{
 	    String msg;
+	    
 	    try 
 		{
 		    while((msg = br.readLine()) != null)
@@ -121,7 +133,8 @@ class Send implements Runnable
 			    this.dos.writeBytes(msg+"\r\n");
 			    dos.flush();
 			}
-		}		
+		}
+	    
 	    catch (IOException e) 
 		{
 		    e.printStackTrace();
@@ -134,6 +147,7 @@ class Send implements Runnable
 			this.dos.writeBytes(bs+"\r\n");
 			dos.flush();
 		}
+		
 		catch(IOException ex)
 		{
 			ex.printStackTrace();
@@ -158,10 +172,12 @@ class Receive implements Runnable
 			this.dis = new DataInputStream(sock.getInputStream());
 			this.output = output;
 		}
+		
 		catch (SocketException sockEx)
 		{
 			sockEx.printStackTrace();
 		}
+		
 		catch (IOException e) 
 		{
 			e.printStackTrace();
@@ -178,6 +194,7 @@ class Receive implements Runnable
 		{
 			while((msg = dis.readLine())!=null)
 			{
+				
 				if(msg.equals("$$PROJECT$$"))
 				{
 					project = new ProjectPPT(dis);
@@ -201,6 +218,7 @@ class Receive implements Runnable
 					project.extractFiles(file, extractionPath, fileName);
 					
 				}
+				
 				else if(msg.equals("$$CLOSEPROJECTION$$"))
 				{
 					project.dismissFrame();
@@ -213,6 +231,7 @@ class Receive implements Runnable
 					send.sendMessage(InetAddress.getLocalHost().getHostAddress());
 					send.sendMessage(InetAddress.getLocalHost().getHostName());
 				}
+				
 				else
 					this.output.append(msg+"\n");
 			}
