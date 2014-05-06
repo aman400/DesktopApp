@@ -5,6 +5,8 @@ package remoteppt.aman.desktopapp;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -27,22 +29,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
-
-public class StartPhotoViewer 
+public class PresentationCreator implements WindowListener
 {
-	public static void main(String[] args)
-	{
-		PhotoViewer viewer = new PhotoViewer();
-		viewer.setGUI();
-	}
-	
-	
-}
-
-
-class PhotoViewer
-{
-	private JFrame frame;
+	private JFrame frame, droidDrowFrame;
 	private JButton BrowseButton, up, down, showImage, delete, zipFiles;
 	private JPanel panel, displayPanel;
 	private JTextField choosedFilePath;
@@ -51,13 +40,13 @@ class PhotoViewer
 	private JTable table;
 	private JScrollPane pane;
 	private JLabel label;
-	private ImageIcon image;
 	private Table_model tableModel;
 	
-	PhotoViewer()
+	PresentationCreator(JFrame droidDrowFrame)
 	{
+		this.droidDrowFrame = droidDrowFrame;
 		fileList = new ArrayList<FileHandler>();
-
+		
 		tableModel = new Table_model();
 		table = new JTable();
 		table.setModel(tableModel);
@@ -93,14 +82,13 @@ class PhotoViewer
 					selectedFileIndex.add(i[x]);
 				}
 
-			}
-			
-			
-			
+			}			
 		});
+		
+		this.setupGUI();
 	}
 	
-	public void setGUI()
+	public void setupGUI()
 	{
 		this.frame = new JFrame("Photo Viewer");
 		frame.setSize(1200, 700);
@@ -159,15 +147,15 @@ class PhotoViewer
 		
 		this.ButtonHandler();
 		
-		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.frame.setVisible(true);
 		
 	}
 
 	
-	public void ButtonHandler()
+	private void ButtonHandler()
 	{
-		
+		frame.addWindowListener(this);
 		showImage.addActionListener(new ActionListener()
 		{
 			int index;
@@ -208,7 +196,7 @@ class PhotoViewer
 			@Override
 			public void actionPerformed(ActionEvent event) 
 			{
-				JFileChooser fileChooser = new JFileChooser("/media/aman/SOFTWARES/WALLPAPERS");
+				JFileChooser fileChooser = new JFileChooser("/media/aman");
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("images", "jpg", "png", "jpeg", "ico", "pdf", "gif");
 				fileChooser.setFileFilter(filter);
 				
@@ -323,7 +311,7 @@ class PhotoViewer
 			{
 				try
 				{
-					path = "/home/aman";
+					path = System.getProperty("user.home");
 					fileName = JOptionPane.showInputDialog("Enter File Name");
 					if(fileName.contains("."))fileName = fileName.substring(0, fileName.indexOf("."));
 					if(fileName == null)
@@ -384,6 +372,40 @@ class PhotoViewer
 				return str[index];
 			}
 						
+	}
+
+	@Override
+	public void windowActivated(WindowEvent event) 
+	{ }
+
+	@Override
+	public void windowClosed(WindowEvent event) 
+	{
+		if(!droidDrowFrame.isVisible())
+			this.droidDrowFrame.setVisible(true);
+	}
+
+	@Override
+	public void windowClosing(WindowEvent arg0) 
+	{}
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) 
+	{ }
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) 
+	{ }
+
+	@Override
+	public void windowIconified(WindowEvent arg0) 
+	{ }
+
+	@Override
+	public void windowOpened(WindowEvent arg0) 
+	{
+		if(droidDrowFrame.isVisible())
+			this.droidDrowFrame.setVisible(false);
 	}
 			
 }

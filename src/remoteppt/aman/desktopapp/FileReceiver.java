@@ -1,23 +1,23 @@
 package remoteppt.aman.desktopapp;
 
-import java.io.DataInputStream;
+import java.io.ObjectInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class FileReceiver implements Runnable
 {
 	private FileOutputStream fos;
-	private DataInputStream dis;
+	private ObjectInputStream ois;
 	private long fileLength;
 	private byte[] buffer;
 	private int count;
 	private long receivedLength;
 	
-	FileReceiver(DataInputStream dis, String path, long fileLength)
+	FileReceiver(ObjectInputStream ois, String path, long fileLength)
 	{
 		try
 		{
-			this.dis = dis;
+			this.ois = ois;
 			this.fos = new FileOutputStream(path);
 			this.fileLength = fileLength;
 			this.buffer =  new byte[1000];
@@ -35,7 +35,7 @@ public class FileReceiver implements Runnable
 	{
 		try
 		{
-			while((count = this.dis.read(this.buffer)) != -1)
+			while((count = this.ois.read(this.buffer)) != -1)
 			{				
 				fos.write(buffer, 0, count);
 				receivedLength += count;

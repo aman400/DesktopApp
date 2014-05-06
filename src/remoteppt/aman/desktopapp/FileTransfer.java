@@ -1,6 +1,6 @@
 package remoteppt.aman.desktopapp;
 
-import java.io.DataOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -8,14 +8,14 @@ public class FileTransfer
 {
 	private byte[] buffer;
 	private FileInputStream fis;
-	private DataOutputStream dos;
+	private ObjectOutputStream oos;
 	
-	FileTransfer(String path, DataOutputStream dos)
+	FileTransfer(String path, ObjectOutputStream oos)
 	{
 		try
 		{
 			this.buffer = new byte[1000];
-			this.dos = dos;
+			this.oos = oos;
 			this.fis = new FileInputStream(path);
 			transferFile();
 		}
@@ -31,8 +31,8 @@ public class FileTransfer
 		int count;
 		while((count = fis.read(buffer, 0, length)) != -1)
 		{
-			dos.write(buffer, 0, count);
-			dos.flush();
+			oos.write(buffer, 0, count);
+			oos.flush();
 		}	
 	}
 }
