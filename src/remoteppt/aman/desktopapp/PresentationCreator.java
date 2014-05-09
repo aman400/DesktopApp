@@ -394,7 +394,7 @@ public class PresentationCreator implements WindowListener
 	{ }
 
 	@Override
-	public void windowDeiconified(WindowEvent arg0) 
+	public void windowDeiconified(WindowEvent arg0)
 	{ }
 
 	@Override

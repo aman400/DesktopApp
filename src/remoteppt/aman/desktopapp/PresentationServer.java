@@ -325,7 +325,87 @@ class Receive implements Runnable
 					}
 				}
 				
+				else if(msg.equals("$$UNDO$$"))
+				{
+					int index = ois.readInt();
+					project.undo(0, index);
+				}
 				
+				else if(msg.equals("$$SHUTDOWN$$"))
+				{
+					try 
+					{
+						SystemController control = new SystemController();
+						control.shutdown();
+						control.executeCommand();
+					} 
+					catch (CommandException e) 
+					{
+						System.err.println("OS does not support this Operation");
+						e.printStackTrace();
+					}
+					catch(IOException ex)
+					{
+						ex.printStackTrace();
+					}
+				}
+				
+				else if(msg.equals("$$RESTART$$"))
+				{
+					try 
+					{
+						SystemController control = new SystemController();
+						control.restart();
+						control.executeCommand();
+					} 
+					catch (CommandException e) 
+					{
+						System.err.println("OS does not support this Operation");
+						e.printStackTrace();
+					}
+					catch(IOException ex)
+					{
+						ex.printStackTrace();
+					}
+				}
+				
+				else if(msg.equals("$$LOGOFF$$"))
+				{
+					try 
+					{
+						SystemController control = new SystemController();
+						control.logoff();
+						control.executeCommand();
+					} 
+					catch (CommandException e) 
+					{
+						System.err.println("OS does not support this Operation");
+						e.printStackTrace();
+					}
+					catch(IOException ex)
+					{
+						ex.printStackTrace();
+					}
+				}
+				
+				else if(msg.equals("$$HIBERNATE$$"))
+				{
+					try 
+					{
+						SystemController control = new SystemController();
+						control.hibernate();
+						control.executeCommand();
+					} 
+					catch (CommandException e) 
+					{
+						System.err.println("OS does not support this Operation");
+						e.printStackTrace();
+					}
+					catch(IOException ex)
+					{
+						ex.printStackTrace();
+					}
+				}
 				else
 					System.out.println(msg);
 			}

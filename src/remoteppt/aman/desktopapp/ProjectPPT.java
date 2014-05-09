@@ -1,12 +1,12 @@
 package remoteppt.aman.desktopapp;
 
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.ObjectInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StreamCorruptedException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 import javax.imageio.IIOException;
@@ -17,9 +17,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-public class ProjectPPT
+public class ProjectPPT extends JFrame
 {
-	private JFrame frame;
 	private JPanel panel;
 	private JLabel label;
 	private ObjectInputStream ois;
@@ -37,7 +36,6 @@ public class ProjectPPT
 		this.ois = ois;
 		this.WIDTH = width;
 		this.HEIGHT = height;
-		this.frame = new JFrame();
 		this.panel = new JPanel();
 		this.label = new JLabel();
 		label.setBounds(0, 0, this.WIDTH, this.HEIGHT);
@@ -47,9 +45,9 @@ public class ProjectPPT
 	
 	private void setupGUI()
 	{
-		frame.setTitle("Presentation");
-		frame.setSize(WIDTH, HEIGHT);
-		frame.setResizable(false);
+		setTitle("Presentation");
+		setSize(WIDTH, HEIGHT);
+		setResizable(false);
 		
 		panel.setLayout(null);
 		panel.setSize(WIDTH, HEIGHT);
@@ -67,29 +65,36 @@ public class ProjectPPT
 		this.panel.add(label);
 		this.panel.add(progressBar);
 		
-		this.frame.add(panel);
-		this.frame.add(whiteBoard);
+		this.add(panel);
+		this.add(whiteBoard);
 		this.whiteBoard.setVisible(false);
 		
-		this.frame.setVisible(true);
-		this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.setVisible(true);
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
+	}
+	
+	@Override
+	public void paint(Graphics g)
+	{
+		super.paint(g);
+		whiteBoard.repaint();
 	}
 	
 	public boolean isRunning()
 	{
-		return frame.isVisible();
+		return isVisible();
 	}
 	
 	public JFrame getFrame()
 	{
-		return this.frame;
+		return this;
 	}
 	
 	// close Frame
 	public void dismissFrame()
 	{
-		frame.dispose();
+		dispose();
 	}
 	
 	// Show WhiteBoard
@@ -138,16 +143,10 @@ public class ProjectPPT
 			fos.close();
 		}
 		
-		catch(StreamCorruptedException exception)
-		{
-			exception.printStackTrace();
-			frame.dispose();
-		}
-		
 		catch(IOException ex)
 		{
 			ex.printStackTrace();
-			frame.dispose();
+			this.dispose();
 		}
 	}
 	
@@ -197,7 +196,7 @@ public class ProjectPPT
 		}
 		catch(IllegalArgumentException exception)
 		{
-			frame.dispose();
+			this.dispose();
 		}
 		
 		catch(IOException exception)
@@ -240,4 +239,10 @@ public class ProjectPPT
 			ex.printStackTrace();
 		}
 	 }
+	
+	public void undo(int start, int end)
+	{
+		whiteBoard.undo(start, end);
+		repaint();
+	}
 }
