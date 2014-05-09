@@ -36,7 +36,7 @@ public class Whiteboard extends JPanel
 		this.setLayout(null);		
 		
 		this.setBounds(0, 0, this.width, this.height);
-		this.setBackground(new Color(0, 0, 0, 10));
+		this.setBackground(new Color(0, 0, 0, 0));
 		
 		this.setVisible(true);
 	}
@@ -68,20 +68,65 @@ public class Whiteboard extends JPanel
 	@Override
 	public void paint(Graphics graphics)
 	{
+		super.paint(graphics);
 		Graphics2D g = (Graphics2D)graphics.create();
 		g.setStroke(new BasicStroke(3));
 		
 		for(int i = 0;  i < points.size() - 1; i++)
 		{			
-			
 			if((points.get(i).getIntX() == 0 && points.get(i).getIntY() == 0) || (points.get(i + 1).getIntX() == 0 && points.get(i + 1).getIntY() == 0))
 				continue;					
 			
 			else
 			{
-				g.setColor(Color.getColor(points.get(i).getColor()));
-				g.drawLine(points.get(i).getIntX(), points.get(i).getIntY(), points.get(i + 1).getIntX(), points.get(i + 1).getIntY());		
+				g.setColor(stringToColor(points.get(i).getColor()));
+				g.drawLine(points.get(i).getIntX(), points.get(i).getIntY(), points.get(i + 1).getIntX(), points.get(i + 1).getIntY());
 			}
+		}
+	}
+	
+	public Color stringToColor(String color)
+	{
+		if(color.equals("white"))
+			return Color.white;
+		
+		else if(color.equals("red"))
+			return Color.red;
+		
+		else if(color.equals("blue"))
+			return Color.blue;
+		
+		else if(color.equals("green"))
+			return Color.green;
+		
+		else if(color.equals("gray"))
+			return Color.gray;
+		
+		else if(color.equals("yellow"))
+			return Color.yellow;
+		
+		else if(color.equals("magenta"))
+			return Color.magenta;
+		
+		else if(color.equals("cyan"))
+			return Color.cyan;
+		
+		else 
+			return Color.black;
+	}
+	
+	public void undo(int start,int end)
+	{
+		points = new ArrayList<PointHandler>(this.points.subList(start, end));
+	}
+	
+	public void showPoints()
+	{
+		System.out.println("points are : ");
+		int index = 0;
+		for(PointHandler point : points)
+		{
+			System.out.println(++index);
 		}
 	}
 }
