@@ -46,13 +46,17 @@ public class ZipExtractor implements Runnable
 			{
 				fis.close();
 				zis.close();
-				new Thread(new Cleanup("/home/aman/Droid Drow")).start();
+				new Thread(new Cleanup(System.getProperties().getProperty("user.home") + File.separator + "Droid Drow")).start();
 			}
 			catch(FileNotFoundException exception)
 			{
 				fis.close();
 				zis.close();
 			}
+		}
+		catch(NullPointerException excepion)
+		{
+			throw new NullPointerException();
 		}
 		catch(IOException ex)
 		{
