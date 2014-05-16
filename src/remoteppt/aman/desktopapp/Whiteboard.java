@@ -119,14 +119,4 @@ public class Whiteboard extends JPanel
 	{
 		points = new ArrayList<PointHandler>(this.points.subList(start, end));
 	}
-	
-	public void showPoints()
-	{
-		System.out.println("points are : ");
-		int index = 0;
-		for(PointHandler point : points)
-		{
-			System.out.println(++index);
-		}
-	}
 }
