@@ -1,7 +1,10 @@
 package remoteppt.aman.desktopapp;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,17 +22,19 @@ import javax.swing.JProgressBar;
 
 public class ProjectPPT extends JFrame
 {
+	private static final long serialVersionUID = 1L;
+	
 	private JPanel panel;
 	private JLabel label;
 	private ObjectInputStream ois;
 	private JProgressBar progressBar;
 	private long maximumLength;
-	private int WIDTH;
-	private int HEIGHT;
+	private int WIDTH, HEIGHT, screenWidth, screenHeight, positionX, positionY;
 	private ArrayList<String> slides;
 	private int index = 0;
 	private File receivedFileExtractionDirectory;
 	private Whiteboard whiteBoard;
+	private boolean receiveFlag;
 	
 	ProjectPPT(ObjectInputStream ois, int width, int height)
 	{
@@ -40,6 +45,14 @@ public class ProjectPPT extends JFrame
 		this.label = new JLabel();
 		label.setBounds(0, 0, this.WIDTH, this.HEIGHT);
 		
+		// Get screen dimension
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+		screenWidth = (int)dimension.getWidth();
+		screenHeight = (int)dimension.getHeight();
+		
+		positionX = (int)(screenWidth/2 - width/2);
+		positionY = (int)(screenHeight/2 - height/2);
+		
 		setupGUI();
 	}
 	
@@ -48,7 +61,7 @@ public class ProjectPPT extends JFrame
 		setTitle("Presentation");
 		setSize(WIDTH, HEIGHT);
 		setResizable(false);
-		
+		this.setLocation(positionX, positionY);
 		panel.setLayout(null);
 		panel.setSize(WIDTH, HEIGHT);
 		panel.setBounds(0, 0, WIDTH, HEIGHT);
@@ -94,6 +107,7 @@ public class ProjectPPT extends JFrame
 	// close Frame
 	public void dismissFrame()
 	{
+		dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 		dispose();
 	}
 	
@@ -119,6 +133,7 @@ public class ProjectPPT extends JFrame
 	public void recieveFile(String path, long length)
 	{
 		long receivedLength = 0;
+		receiveFlag = true;
 		maximumLength = length;
 		int count = 0;
 		byte[] buffer = new byte[1000];
@@ -137,7 +152,7 @@ public class ProjectPPT extends JFrame
 				receivedLength += count;
 				setProgressBarValue(receivedLength);
 
-				if(length == receivedLength)
+				if(length == receivedLength || !receiveFlag)
 					break;
 			}
 			fos.close();
@@ -146,7 +161,7 @@ public class ProjectPPT extends JFrame
 		catch(IOException ex)
 		{
 			ex.printStackTrace();
-			this.dispose();
+			this.dismissFrame();
 		}
 	}
 	
@@ -194,16 +209,10 @@ public class ProjectPPT extends JFrame
 		{
 			ex.printStackTrace();
 		}
-		catch(IllegalArgumentException exception)
+		catch(Exception exception)
 		{
 			this.dispose();
 		}
-		
-		catch(IOException exception)
-		{
-			exception.printStackTrace();
-		}
-		
 	}
 	 
 	// Extract presentations to the given directory
@@ -234,15 +243,29 @@ public class ProjectPPT extends JFrame
 		{
 			exception.printStackTrace();
 		}
+		catch(NullPointerException exception)
+		{
+			this.dismissFrame();
+		}
 		catch(InterruptedException ex)
 		{
 			ex.printStackTrace();
 		}
-	 }
+	}
 	
 	public void undo(int start, int end)
 	{
 		whiteBoard.undo(start, end);
 		repaint();
+	}
+	
+	@Override
+	protected void processWindowEvent(WindowEvent e)
+	{
+		super.processWindowEvent(e);
+		if(e.getID() == WindowEvent.WINDOW_CLOSING)
+		{
+			receiveFlag = false;
+		}
 	}
 }
