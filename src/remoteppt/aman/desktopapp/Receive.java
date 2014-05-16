@@ -51,7 +51,7 @@ public class Receive implements Runnable
 		
 		try 
 		{
-			while((msg = this.recieveMessage())!=null)
+			while((msg = this.getMessage())!=null)
 			{
 				
 				// Open presentation projection screen
@@ -63,8 +63,8 @@ public class Receive implements Runnable
 						project = null;
 					}
 					
-					this.width = this.getInt();
-					this.height = this.getInt();
+					this.width = this.readInt();
+					this.height = this.readInt();
 					Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 					int screenWidth = (int) dim.getWidth();
 					int screenHeight = (int) dim.getHeight();
@@ -92,8 +92,8 @@ public class Receive implements Runnable
 					
 					project = new ProjectPPT(ois, this.width, this.height);
 					
-					String fileName = this.recieveMessage();
-					long fileSize = this.getLong();
+					String fileName = this.getMessage();
+					long fileSize = this.readLong();
 					
 					file = new File(rootDrive + File.separatorChar + "Droid Drow" + File.separatorChar + "Files" + File.separatorChar + fileName); 
 					extractionPath = new File(rootDrive + File.separatorChar + "Droid Drow" + File.separatorChar + "Extracted Files" + File.separatorChar);
@@ -147,8 +147,8 @@ public class Receive implements Runnable
 				{
 					try
 					{
-						Float x = this.getFloat();
-						Float y = this.getFloat();
+						Float x = this.readFloat();
+						Float y = this.readFloat();
 						
 						if(x != 0 && y != 0)
 						{
@@ -156,7 +156,7 @@ public class Receive implements Runnable
 							y = getScaledDrawingPixelHeight(y);
 						}
 						
-						String color = this.recieveMessage();
+						String color = this.getMessage();
 						point = new PointHandler(x, y, color);
 						project.addPoint(point);
 					}
@@ -187,7 +187,7 @@ public class Receive implements Runnable
 				
 				else if(msg.equals("$$UNDO$$"))
 				{
-					int index = this.getInt();
+					int index = this.readInt();
 					project.undo(0, index);
 				}
 				
@@ -307,23 +307,24 @@ public class Receive implements Runnable
 		return this.scalingHeight * y;
 	}
 	
-	public String recieveMessage()throws IOException
+	public String getMessage()throws IOException
 	{
 		return ois.readLine();
 	}
 	
-	public int getInt()throws IOException
+	public int readInt()throws IOException
 	{
 		return ois.readInt();
 	}
 	
-	public long getLong() throws IOException
+	public long readLong()throws IOException
 	{
 		return ois.readLong();
 	}
 	
-	public float getFloat()throws IOException
+	public Float readFloat()throws IOException
 	{
 		return ois.readFloat();
 	}
+	
 }
