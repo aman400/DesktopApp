@@ -8,7 +8,6 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
@@ -147,7 +146,7 @@ public class ProjectPPT extends JFrame
 			
 			// Read data from network and write to file
 			while((count = ois.read(buffer)) != -1)
-			{				
+			{		
 				fos.write(buffer, 0, count);
 				receivedLength += count;
 				setProgressBarValue(receivedLength);
@@ -158,7 +157,7 @@ public class ProjectPPT extends JFrame
 			fos.close();
 		}
 		
-		catch(IOException ex)
+		catch(Exception ex)
 		{
 			ex.printStackTrace();
 			this.dismissFrame();
