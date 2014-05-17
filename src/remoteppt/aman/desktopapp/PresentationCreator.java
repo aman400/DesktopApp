@@ -165,26 +165,7 @@ public class PresentationCreator implements WindowListener
 
 				if((index = table.getSelectedRow()) != -1);
 				{
-					try
-					{
-						
-						String path = fileList.get(index).getFilePath();
-						
-						BufferedImage image = ImageIO.read(new File(path));
-						ImageIcon icon = new ImageIcon(image);
-						
-						Image img = icon.getImage().getScaledInstance(label.getWidth(), label.getHeight(), BufferedImage.SCALE_SMOOTH);
-						label.setIcon(new ImageIcon(img));
-						
-					}
-					catch(IOException ex)
-					{
-						ex.printStackTrace();
-					}
-					catch(ArrayIndexOutOfBoundsException ex)
-					{
-						JOptionPane.showMessageDialog(frame, "Select Some row");
-					}
+					viewImage(fileList.get(index).getFilePath());
 				}
 				
 			}
@@ -207,6 +188,7 @@ public class PresentationCreator implements WindowListener
 					FileHandler newFile = new FileHandler(fileChooser.getSelectedFile().getName(),fileChooser.getSelectedFile().getAbsolutePath());
 					fileList.add(newFile);
 					tableModel.fireTableDataChanged();
+					viewImage(newFile.getFilePath());
 					
 				}
 			}
@@ -312,6 +294,9 @@ public class PresentationCreator implements WindowListener
 				try
 				{
 					path = System.getProperty("user.home");
+					path = path + File.separator + "Presentations";
+					if(!new File(path).exists())new File(path).mkdirs();
+					
 					fileName = JOptionPane.showInputDialog("Enter File Name");
 					if(fileName.contains("."))fileName = fileName.substring(0, fileName.indexOf("."));
 					if(fileName == null)
@@ -319,7 +304,7 @@ public class PresentationCreator implements WindowListener
 						throw new IOException();
 					}
 					new FileZipper(selectedFiles, fileName, path);
-					JOptionPane.showMessageDialog(frame, "Files zipped at location " + path + File.separatorChar + fileName + ".zip");
+					JOptionPane.showMessageDialog(frame, "Files zipped at location " + path + File.separatorChar + fileName);
 				}
 				catch(NullPointerException ex)
 				{
@@ -372,6 +357,27 @@ public class PresentationCreator implements WindowListener
 				return str[index];
 			}
 						
+	}
+	
+	public void viewImage(String path)
+	{
+		try
+		{			
+			BufferedImage image = ImageIO.read(new File(path));
+			ImageIcon icon = new ImageIcon(image);
+			
+			Image img = icon.getImage().getScaledInstance(label.getWidth(), label.getHeight(), BufferedImage.SCALE_SMOOTH);
+			label.setIcon(new ImageIcon(img));
+			
+		}
+		catch(IOException ex)
+		{
+			ex.printStackTrace();
+		}
+		catch(ArrayIndexOutOfBoundsException ex)
+		{
+			JOptionPane.showMessageDialog(frame, "Select Some row");
+		}
 	}
 
 	@Override
