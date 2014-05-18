@@ -1,80 +1,252 @@
 package remoteppt.aman.desktopapp;
 /** This code starts Server to display presentation. */
 
-import java.awt.FlowLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 
 public class PresentationServer implements WindowListener
 {
     // Declare Instance variables.
-    private JFrame jf, droidDrowFrame;
-    private JLabel title;
+    private JFrame jf;
+    private JLabel label, title, serverLabel;
+    private JPanel upperPanel, lowerPanel;
+    private JTextArea output;
+    private JButton start, stop, create;
+    private Font font;
+    private Image image;
+    private Thread thread;
+    private Networking net;
+    
+    private final int width = 1000;
+    private final int height = 700;
     private final int PORT = 5678;
 	
     // Constructor for class
-    PresentationServer(JFrame droidDrowFrame)
-    {
-    	
-    	this.droidDrowFrame = droidDrowFrame;
+    PresentationServer()
+    {	
     	
 		// Initialize Instance variables
-		this.jf = new JFrame("Server");
-		this.title = new JLabel("Server has been started!!! You can use your android device to view and control presentation.");
-		jf.addWindowListener(this);
+		this.jf = new JFrame("Droid Ranger");
+		this.jf.setLayout(null);
+		jf.setSize(width, height);
 		
+		try 
+		{       
+	    	UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+	    	SwingUtilities.updateComponentTreeUI(jf);
+	    } 
+	    catch (UnsupportedLookAndFeelException e) {}
+	    catch (ClassNotFoundException e) {}
+	    catch (InstantiationException e) {}
+	    catch (IllegalAccessException e) {}
 		
-		jf.setLayout(new FlowLayout());
+		start = new JButton("Start Server");
+		stop = new JButton("Stop Server");
+		create = new JButton("Create PPT");
+		start.setBackground(Color.black);
+		stop.setBackground(Color.black);
+		create.setBackground(Color.black);
+		start.setFocusable(false);
+		stop.setFocusable(false);
+		create.setFocusable(false);
+		
+		start.setForeground(Color.red);
+		stop.setForeground(Color.red);
+		create.setForeground(Color.red);
+		start.setBounds(550, 50, 150, 30);
+		stop.setBounds(100, 410, 150, 30);
+		create.setBounds(550, 410, 150, 30);
+		stop.setEnabled(false);
+		this.setButtonListeners();
+		
+		label = new JLabel();
+		Font f = new Font(Font.SANS_SERIF, Font.BOLD, 30);
+		title = new JLabel("Droid Ranger");
+		serverLabel = new JLabel("Status Window");
+		serverLabel.setBounds(100, 50, 150, 30);
+		title.setFont(f);
+		
+		title.setBounds(350, 20, 300, 100);
+		title.setForeground(new Color(23, 230, 200));
+		
+		label.setBounds(0, 0, width, height);
+		
+		font = new Font(Font.SANS_SERIF, Font.ITALIC|Font.BOLD, 20);
 		
 		// set components size and bounds
-		jf.setSize(800, 100);
-				
-		jf.setLocation(900, 300);
+		Dimension dim = new ScreenHandler().getScreenCentredLocation(width, height);
+		jf.setLocation((int)dim.getWidth(), (int)dim.getHeight());
 		jf.setResizable(false);
 		
-		// add components to Frame
-		this.jf.add(this.title);
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream input = classLoader.getResourceAsStream("background.jpeg");
+		try 
+		{
+			image = ImageIO.read(input);
+			label.setIcon(new ImageIcon(image.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH)));
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		
+		upperPanel = new JPanel();
+		lowerPanel = new JPanel();
+		upperPanel.setLayout(null);
+		lowerPanel = new JPanel();
+		
+		dim = new ScreenHandler().getCentredWindowsLocation(width, height, 600, 300);
+		upperPanel.setBounds((int)dim.getWidth(), (int)dim.getHeight(), 600, 300);
+		upperPanel.setBackground(new Color(0, 0, 0, 50));
+		
+		output = new JTextArea(30, 20);
+		output.setBounds(10, 10, 580, 280);
+		output.setFont(font);
+		output.setEditable(false);
+		output.setForeground(Color.blue);
+		
+		upperPanel.add(output);
+		
+		
+		dim = new ScreenHandler().getCentredWindowsLocation(width, height, 800, 500);
+		lowerPanel.setBounds((int)dim.getWidth(), (int)dim.getHeight(), 800, 500);
+		lowerPanel.setBackground(new Color(0, 0, 0, 50));
+		lowerPanel.setLayout(null);
+		lowerPanel.setVisible(true);
+		lowerPanel.add(start);
+		lowerPanel.add(stop);
+		lowerPanel.add(create);
+			
+		jf.addWindowListener(this);
+		jf.add(upperPanel);
+		jf.add(lowerPanel);
+		jf.add(title);
+		jf.add(label);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		jf.setVisible(true);
-		new Thread(new Networking(jf, PORT)).start();
     }
     
-    @Override
-	public void windowActivated(WindowEvent event) 
-	{ }
+    public void setText(String text)
+    {
+    	output.append(text + "\n");
+    }
+    
+    private void startServer()
+    {
+    	net = new Networking(jf, PORT);
+		thread = new Thread(net);
+		thread.start();
+    }
+    
+    private void stopServer()
+    {
+    	net.stopServer();
+    }
+    
+    private void setButtonListeners()
+    {
+    	this.start.addActionListener(new ActionListener() 
+    	{
+			
+			@Override
+			public void actionPerformed(ActionEvent event)
+			{
+				startServer();
+				stop.setEnabled(true);
+				start.setEnabled(false);
+				setText("Server Started");
+			}
+		});
+    	
+    	this.stop.addActionListener(new ActionListener() 
+    	{
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				stopServer();
+				stop.setEnabled(false);
+				start.setEnabled(true);
+				setText("Server Stoped");
+			}
+		});
+    	
+    	this.create.addActionListener(new ActionListener()
+    	{	
+			@Override
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				new PresentationCreator(jf);
+			}
+		});
+    	
+    }
+    
+    public static void main(String[] args)
+    {
+    	new PresentationServer();
+    }
 
 	@Override
-	public void windowClosed(WindowEvent event) 
-	{
-		if(!droidDrowFrame.isVisible())
-			this.droidDrowFrame.setVisible(true);
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
-	public void windowClosing(WindowEvent arg0) 
-	{}
-
-	@Override
-	public void windowDeactivated(WindowEvent arg0) 
-	{ }
-
-	@Override
-	public void windowDeiconified(WindowEvent arg0) 
-	{ }
-
-	@Override
-	public void windowIconified(WindowEvent arg0) 
-	{ }
-
-	@Override
-	public void windowOpened(WindowEvent arg0) 
-	{
-		if(droidDrowFrame.isVisible())
-			this.droidDrowFrame.setVisible(false);
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
+
+	@Override
+	public void windowClosing(WindowEvent e) 
+	{
+		if(stop.isEnabled())
+			stop.doClick();
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) 
+	{}     
 }

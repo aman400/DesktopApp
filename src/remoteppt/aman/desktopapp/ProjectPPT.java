@@ -28,7 +28,7 @@ public class ProjectPPT extends JFrame
 	private ObjectInputStream ois;
 	private JProgressBar progressBar;
 	private long maximumLength;
-	private int WIDTH, HEIGHT, screenWidth, screenHeight, positionX, positionY;
+	private int WIDTH, HEIGHT, positionX, positionY;
 	private ArrayList<String> slides;
 	private int index = 0;
 	private File receivedFileExtractionDirectory;
@@ -45,12 +45,11 @@ public class ProjectPPT extends JFrame
 		label.setBounds(0, 0, this.WIDTH, this.HEIGHT);
 		
 		// Get screen dimension
-		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-		screenWidth = (int)dimension.getWidth();
-		screenHeight = (int)dimension.getHeight();
+		ScreenHandler screen = new ScreenHandler();
+		Dimension dimension = screen.getScreenCentredLocation(width, height);
 		
-		positionX = (int)(screenWidth/2 - width/2);
-		positionY = (int)(screenHeight/2 - height/2);
+		positionX = (int)dimension.getWidth();
+		positionY = (int)dimension.getHeight();
 		
 		setupGUI();
 	}

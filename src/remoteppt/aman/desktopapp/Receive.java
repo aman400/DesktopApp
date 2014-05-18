@@ -109,8 +109,14 @@ public class Receive implements Runnable
 					project.recieveFile(file.getAbsolutePath(), fileSize);
 					
 					// Extract files to directory
-					project.extractFiles(file, extractionPath, fileName);
-					
+					try
+					{
+						project.extractFiles(file, extractionPath, fileName);
+					}
+					catch(NullPointerException exception)
+					{
+						System.out.println("Unable to Project");
+					}
 				}
 				
 				// Send IP address and host name to client
@@ -144,13 +150,23 @@ public class Receive implements Runnable
 					{
 						File f = new File(System.getProperty("user.home") + File.separator + "Presentations");
 						PresentationFiles = f.listFiles();
-						for(File singleFile : PresentationFiles)
+						try
 						{
-							send.sendMessage("$$FILE$$");
-							send.sendMessage(singleFile.getName());
-							send.writeLong(singleFile.length());
+							for(File singleFile : PresentationFiles)
+							{
+								send.sendMessage("$$FILE$$");
+								send.sendMessage(singleFile.getName());
+								send.writeLong(singleFile.length());
+							}
 						}
-						send.sendMessage("$$DOWNLOAD$$");
+						catch(NullPointerException exception)
+						{
+							System.out.println("No files in Directory.");
+						}
+						finally
+						{
+							send.sendMessage("$$DOWNLOAD$$");
+						}
 					}
 					catch(NullPointerException exception)
 					{

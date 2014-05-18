@@ -11,6 +11,7 @@ public class Server implements Runnable
 	private int port;
 	public Send send;
 	public Receive receive;
+	private Thread sendThread, receiveThread;
 	
 	Server(int port)
 	{
@@ -26,8 +27,10 @@ public class Server implements Runnable
 			sock = serSock.accept();
 			send = new Send(sock);
 			receive = new Receive(sock, send);
-			new Thread(send).start();
-			new Thread(receive).start();			
+			sendThread = new Thread(send);
+			sendThread.start();
+			receiveThread = new Thread(receive);
+			receiveThread.start();			
 		}
 		
 		catch(Exception exception)

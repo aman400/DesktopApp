@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -34,6 +33,11 @@ class Networking implements Runnable
     		this.sersock = new ServerSocket(PORT);
     		while(true)
     		{
+    			
+    			if(Thread.interrupted())
+    			{
+    				throw new InterruptedException();
+    			}
     			this.sock = sersock.accept();
 		
     			send = new Send(sock);
@@ -44,11 +48,31 @@ class Networking implements Runnable
 				new Thread(receive).start();
     		}
 	    }
-    	catch(Exception ex)
+    	catch(InterruptedException ex)
+    	{
+    		Thread.currentThread().interrupt();
+    	}
+    	catch(BindException ex)
     	{
     		JOptionPane.showMessageDialog(frame, "Server Already Running!!!");
     		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     		frame.dispose();
     	}
+    	catch(IOException ex)
+    	{
+    		
+    	}
     }
+    
+    public void stopServer()
+	{
+		try
+		{
+			sersock.close();
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+	}
 }
