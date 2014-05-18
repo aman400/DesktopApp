@@ -60,4 +60,36 @@ class Send implements Runnable
 			ex.printStackTrace();
 		}
 	}
+	
+	public void writeLong(long number)
+	{
+		try
+		{
+			this.oos.writeLong(number);
+			oos.flush();
+		}
+		catch(IOException exception)
+		{
+			exception.printStackTrace();
+		}
+	}
+	
+	public void writeInt(int number)
+	{
+		try 
+		{
+			this.oos.writeInt(number);
+			oos.flush();
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void sendFile(String path)
+	{
+		new FileTransfer(path, oos);
+		
+	}
 }

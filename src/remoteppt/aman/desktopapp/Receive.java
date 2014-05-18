@@ -18,6 +18,7 @@ public class Receive implements Runnable
 	private String rootDrive;
 	private int height, width; 
 	private float scalingWidth, scalingHeight;
+	private File[] PresentationFiles;
 	
 	Receive(Socket sock, Send send)
 	{
@@ -137,6 +138,27 @@ public class Receive implements Runnable
 					project.openWhiteBoard();
 				}
 				
+				else if(msg.equals("$$DOWNLOAD$$"))
+				{
+					try
+					{
+						File f = new File(System.getProperty("user.home") + File.separator + "Presentations");
+						PresentationFiles = f.listFiles();
+						for(File singleFile : PresentationFiles)
+						{
+							send.sendMessage("$$FILE$$");
+							send.sendMessage(singleFile.getName());
+							send.writeLong(singleFile.length());
+						}
+						send.sendMessage("$$DOWNLOAD$$");
+					}
+					catch(NullPointerException exception)
+					{
+						exception.printStackTrace();
+					}
+				}
+				
+				// Close WhiteBoard
 				else if(msg.equals("$$CLOSEWHITEBOARD$$"))
 				{
 					project.closeWhiteBoard();
@@ -164,8 +186,16 @@ public class Receive implements Runnable
 					{
 						exception.printStackTrace();
 					}
-					
 				}
+				
+				// send file to Android Device
+				else if(msg.equals("$$SENDFILE$$"))
+				{
+					String name = this.getMessage();
+					send.sendMessage("$$SENDINGFILE$$");
+					send.sendFile(System.getProperty("user.home") + File.separator + "Presentations" + File.separator + name);
+				}
+				
 				// Show previous slide
 				else if(msg.equals("$$PREVIOUSSLIDE$$"))
 				{
