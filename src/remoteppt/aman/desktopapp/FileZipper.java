@@ -11,8 +11,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
-import javax.swing.JOptionPane;
-
 
 public class FileZipper implements Runnable
 {
@@ -57,13 +55,11 @@ public class FileZipper implements Runnable
 				if(f.isFile())
 				{
 					addFileToZip(file.getFilePath(), zos, Integer.toString(i));
-					System.out.println(file.getFileName());
 					i++;
 				}
 				else
 				{
 					addFileToZip(file.getFilePath(), zos, file.getFileName());
-					System.out.println(file.getFileName());
 				}
 			}
 		}

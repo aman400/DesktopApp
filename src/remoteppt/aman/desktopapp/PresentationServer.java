@@ -73,9 +73,9 @@ public class PresentationServer implements WindowListener
 		stop.setFocusable(false);
 		create.setFocusable(false);
 		
-		start.setForeground(Color.red);
+		start.setForeground(Color.green);
 		stop.setForeground(Color.red);
-		create.setForeground(Color.red);
+		create.setForeground(Color.orange);
 		start.setBounds(550, 50, 150, 30);
 		stop.setBounds(100, 410, 150, 30);
 		create.setBounds(550, 410, 150, 30);

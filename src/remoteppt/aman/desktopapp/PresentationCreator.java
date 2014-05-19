@@ -3,6 +3,7 @@
 package remoteppt.aman.desktopapp;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -33,16 +35,17 @@ public class PresentationCreator
 {
 	private JFrame frame;
 	private JButton BrowseButton, up, down, showImage, delete, zipFiles;
-	private JPanel panel, displayPanel;
+	private JPanel displayPanel, browsePanel, buttonPanel, tablePanel;
 	private JTextField choosedFilePath;
 	private ArrayList<FileHandler> fileList, selectedFiles;
 	private ArrayList<Integer> selectedFileIndex;
 	private JTable table;
 	private JScrollPane pane;
-	private JLabel label, background;
+	private JLabel label, background, tableLabel, choosedFileLabel, slidesLabel;
 	private Table_model tableModel;
 	private final int width = 1200;
-	private final int height = 700;
+	private final int height = 800;
+	private Font font, buttonFont;
 	
 	PresentationCreator()
 	{
@@ -52,6 +55,9 @@ public class PresentationCreator
 		table = new JTable();
 		table.setModel(tableModel);
 		background = new JLabel();
+		background.setBounds(0, 0, width, height);
+		font = new Font(Font.SANS_SERIF, Font.ITALIC, 13);
+		buttonFont = new Font(Font.SANS_SERIF, Font.BOLD|Font.ITALIC, 15);
 
 		
 		table.setEditingRow(0);
@@ -83,6 +89,10 @@ public class PresentationCreator
 				{
 					selectedFileIndex.add(i[x]);
 				}
+				if(selectedFiles.size() != 0)
+				{
+					showImage.doClick();
+				}
 
 			}			
 		});
@@ -92,74 +102,120 @@ public class PresentationCreator
 	
 	public void setupGUI()
 	{
-		this.frame = new JFrame("Photo Viewer");
+		this.frame = new JFrame("Presentation Creator");
 		frame.setSize(this.width, this.height);
+		frame.setResizable(false);
 		frame.setLocation(400, 200);
 		this.frame.setLayout(null);		
 		
-		pane = new JScrollPane(table);
-		pane.setBounds(50, 150, 450, 300);
+		setImage(background, "background.jpeg");
 		
-		label = new JLabel();
-		label.setBounds(50, 50, 500, 500);
-		background.setBounds(0, 0, width, height);
-		
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		InputStream input = classLoader.getResourceAsStream("background1.jpg");
-		try 
-		{
-			Image image = ImageIO.read(input);
-			background.setIcon(new ImageIcon(image.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH)));
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
-		
-		this.panel = new JPanel();
-		this.panel.setLayout(null);
 		this.displayPanel = new JPanel();
 		this.displayPanel.setLayout(null);
-		this.displayPanel.setBounds(500, 0, 700, 700);
-		this.panel.setLayout(null);
+		this.displayPanel.setBackground(new Color(0, 0, 0, 50));
+		slidesLabel = new JLabel("Slide Preview");
+		slidesLabel.setForeground(Color.green);
+		slidesLabel.setBounds(30, 5, 300, 20);
+		label = new JLabel();
+		label.setBounds(30, 30, 500, 500);
+		setImage(label, "no_preview.png");
 		
-		this.showImage = new JButton("View");
-		this.showImage.setBounds(50, 500, 100, 30);
+		background.setBounds(0, 0, width, height);
+		this.displayPanel.setBounds(600, 120, 550, 550);
+		this.displayPanel.add(label);
+		this.displayPanel.add(slidesLabel);
 		
-		this.up = new JButton("Move up");
-		this.up.setBounds(170, 500, 100, 30);
 		
-		this.down = new JButton("down");
-		this.down.setBounds( 290, 500, 100, 30);
+		this.browsePanel = new JPanel();
+		this.browsePanel.setLayout(null);
+		this.choosedFileLabel = new JLabel("Add Slides to Create PPT File");
+		choosedFileLabel.setBounds(30, 5, 300, 30);
+		choosedFileLabel.setForeground(Color.GREEN);
+		this.browsePanel.setBounds(50, 30, width, 70);
+		this.browsePanel.setBackground(new Color(0, 0, 0, 30));
+		this.BrowseButton = new JButton("Browse");
+		BrowseButton.setFont(buttonFont);
+		BrowseButton.setBackground(Color.black);
+		BrowseButton.setForeground(Color.green);
+		this.BrowseButton.setBounds(600, 30, 100, 30);
+		this.choosedFilePath = new JTextField(50);
+		this.choosedFilePath.setBounds(30, 30, 550, 25);
+		this.choosedFilePath.setFont(font);
+		BrowseButton.setFocusable(false);
+		
+		
+		this.showImage = new JButton("Preview");
+		showImage.setFont(buttonFont);
+		showImage.setForeground(Color.orange);
+		this.showImage.setBounds(900, 30, 150, 30);
+		showImage.setBackground(Color.black);
+		showImage.setFocusable(false);
+		
+		this.browsePanel.add(this.choosedFilePath);
+		this.browsePanel.add(choosedFileLabel);
+		this.browsePanel.add(BrowseButton);
+		this.browsePanel.add(showImage);
+
+		
+		
+	
+		pane = new JScrollPane(table);
+		pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		pane.setBounds(25, 30, 450, 300);
+		tableLabel = new JLabel("Slides List");
+		tableLabel.setBounds(25, 10, 100, 10);
+		tableLabel.setForeground(Color.green);
+		this.tablePanel = new JPanel();
+		this.tablePanel.setLayout(null);
+		this.tablePanel.setBackground(new Color(0, 0, 0, 50));
+		this.tablePanel.setBounds(50, 120, 500, 350);
+		this.table.setFont(font);
+		
+		this.tablePanel.add(pane);
+		this.tablePanel.add(tableLabel);
+		
+		
+		this.buttonPanel = new JPanel();
+		this.buttonPanel.setLayout(null);
+		this.buttonPanel.setBounds(50, 500, 500, 110);
+		this.buttonPanel.setBackground(new Color(0, 0, 0, 30));
+		this.up = new JButton("Up");
+		this.up.setBounds(10, 20, 130, 30);
+		up.setFont(buttonFont);
+		up.setForeground(Color.green);
+		up.setBackground(Color.black);
+		up.setFocusable(false);
+		
+		this.down = new JButton("Down");
+		this.down.setBounds( 170, 20, 130, 30);
+		down.setFont(buttonFont);
+		down.setForeground(Color.green);
+		down.setBackground(Color.black);
+		down.setFocusable(false);
 		
 		this.delete = new JButton("Delete");
-		this.delete.setBounds(400, 500, 100, 30);
+		this.delete.setBounds(330, 20, 130, 30);
+		delete.setFont(buttonFont);
+		delete.setForeground(Color.red);
+		delete.setBackground(Color.black);
+		delete.setFocusable(false);
 		
-		this.BrowseButton = new JButton("Browse");
-		this.BrowseButton.setBounds(400, 100, 100, 20);	
-
-		this.zipFiles = new JButton("Zip Files");
-		this.zipFiles.setBounds(175, 550, 200, 30);
+		this.zipFiles = new JButton("Create PPT");
+		this.zipFiles.setBounds(155, 70, 200, 30);
+		zipFiles.setFont(buttonFont);
+		zipFiles.setForeground(Color.orange);
+		zipFiles.setBackground(Color.black);
+		zipFiles.setFocusable(false);
+	
+		this.buttonPanel.add(up);
+		this.buttonPanel.add(down);
+		this.buttonPanel.add(delete);
+		this.buttonPanel.add(zipFiles);
 		
-		this.panel.setBounds(0, 0, 500, 700);
-		
-		this.choosedFilePath = new JTextField(50);
-		this.choosedFilePath.setBounds(50, 100, 350, 20);
-		
-
-		this.panel.add(showImage);
-		this.panel.add(up);
-		this.panel.add(down);
-		this.panel.add(delete);
-		this.panel.add(zipFiles);
-
-		this.displayPanel.setBackground(new Color(0, 0, 0, 0));
-		this.panel.setBackground(new Color(0, 0, 0, 0));
-		this.panel.add(this.choosedFilePath);
-		this.panel.add(BrowseButton);
-		this.panel.add(pane);
-		this.displayPanel.add(label);
-		this.frame.add(panel);
+		this.frame.add(tablePanel);
+		this.frame.add(buttonPanel);
+		this.frame.add(browsePanel);
 		this.frame.add(displayPanel);
 		this.frame.add(background);
 		
@@ -328,10 +384,10 @@ public class PresentationCreator
 						throw new IOException();
 					}
 				
-					if(selectedFiles.size() == 0)
+					if(fileList.size() == 0)
 						throw new NullPointerException();
 					
-					new FileZipper(selectedFiles, fileName, path);
+					new FileZipper(fileList, fileName, path);
 					JOptionPane.showMessageDialog(frame, "Files zipped at location " + path + File.separatorChar + fileName);
 				}
 				catch(NullPointerException ex)
@@ -387,6 +443,21 @@ public class PresentationCreator
 						
 	}
 	
+	public void setImage(JLabel label, String path)
+	{
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream input = classLoader.getResourceAsStream(path);
+		try 
+		{
+			Image image = ImageIO.read(input);
+			label.setIcon(new ImageIcon(image.getScaledInstance(label.getWidth(), label.getHeight(), BufferedImage.SCALE_SMOOTH)));
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public void viewImage(String path)
 	{
 		try
@@ -400,7 +471,7 @@ public class PresentationCreator
 		}
 		catch(IOException ex)
 		{
-			ex.printStackTrace();
+			setImage(label, "no_preview.png");
 		}
 		catch(ArrayIndexOutOfBoundsException ex)
 		{
