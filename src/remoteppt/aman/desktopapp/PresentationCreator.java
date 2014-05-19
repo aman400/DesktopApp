@@ -2,14 +2,14 @@
 
 package remoteppt.aman.desktopapp;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -29,9 +29,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
-public class PresentationCreator implements WindowListener
+public class PresentationCreator
 {
-	private JFrame frame, droidDrowFrame;
+	private JFrame frame;
 	private JButton BrowseButton, up, down, showImage, delete, zipFiles;
 	private JPanel panel, displayPanel;
 	private JTextField choosedFilePath;
@@ -39,19 +39,21 @@ public class PresentationCreator implements WindowListener
 	private ArrayList<Integer> selectedFileIndex;
 	private JTable table;
 	private JScrollPane pane;
-	private JLabel label;
+	private JLabel label, background;
 	private Table_model tableModel;
+	private final int width = 1200;
+	private final int height = 700;
 	
-	PresentationCreator(JFrame droidDrowFrame)
+	PresentationCreator()
 	{
-		this.droidDrowFrame = droidDrowFrame;
 		fileList = new ArrayList<FileHandler>();
 		
 		tableModel = new Table_model();
 		table = new JTable();
 		table.setModel(tableModel);
+		background = new JLabel();
 
-				
+		
 		table.setEditingRow(0);
 		table.setRowSelectionAllowed(true);
 		
@@ -91,7 +93,7 @@ public class PresentationCreator implements WindowListener
 	public void setupGUI()
 	{
 		this.frame = new JFrame("Photo Viewer");
-		frame.setSize(1200, 700);
+		frame.setSize(this.width, this.height);
 		frame.setLocation(400, 200);
 		this.frame.setLayout(null);		
 		
@@ -100,6 +102,19 @@ public class PresentationCreator implements WindowListener
 		
 		label = new JLabel();
 		label.setBounds(50, 50, 500, 500);
+		background.setBounds(0, 0, width, height);
+		
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream input = classLoader.getResourceAsStream("background1.jpg");
+		try 
+		{
+			Image image = ImageIO.read(input);
+			background.setIcon(new ImageIcon(image.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH)));
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
 		
 		this.panel = new JPanel();
 		this.panel.setLayout(null);
@@ -138,12 +153,15 @@ public class PresentationCreator implements WindowListener
 		this.panel.add(delete);
 		this.panel.add(zipFiles);
 
+		this.displayPanel.setBackground(new Color(0, 0, 0, 0));
+		this.panel.setBackground(new Color(0, 0, 0, 0));
 		this.panel.add(this.choosedFilePath);
 		this.panel.add(BrowseButton);
 		this.panel.add(pane);
 		this.displayPanel.add(label);
 		this.frame.add(panel);
 		this.frame.add(displayPanel);
+		this.frame.add(background);
 		
 		this.ButtonHandler();
 		
@@ -155,7 +173,6 @@ public class PresentationCreator implements WindowListener
 	
 	private void ButtonHandler()
 	{
-		frame.addWindowListener(this);
 		showImage.addActionListener(new ActionListener()
 		{
 			int index;
@@ -165,7 +182,14 @@ public class PresentationCreator implements WindowListener
 
 				if((index = table.getSelectedRow()) != -1);
 				{
-					viewImage(fileList.get(index).getFilePath());
+					try
+					{
+						viewImage(fileList.get(index).getFilePath());
+					}
+					catch(ArrayIndexOutOfBoundsException ex)
+					{
+						JOptionPane.showMessageDialog(frame, "No Files selected!!");
+					}
 				}
 				
 			}
@@ -303,6 +327,10 @@ public class PresentationCreator implements WindowListener
 					{
 						throw new IOException();
 					}
+				
+					if(selectedFiles.size() == 0)
+						throw new NullPointerException();
+					
 					new FileZipper(selectedFiles, fileName, path);
 					JOptionPane.showMessageDialog(frame, "Files zipped at location " + path + File.separatorChar + fileName);
 				}
@@ -378,40 +406,5 @@ public class PresentationCreator implements WindowListener
 		{
 			JOptionPane.showMessageDialog(frame, "Select Some row");
 		}
-	}
-
-	@Override
-	public void windowActivated(WindowEvent event) 
-	{ }
-
-	@Override
-	public void windowClosed(WindowEvent event) 
-	{
-		if(!droidDrowFrame.isVisible())
-			this.droidDrowFrame.setVisible(true);
-	}
-
-	@Override
-	public void windowClosing(WindowEvent arg0) 
-	{}
-
-	@Override
-	public void windowDeactivated(WindowEvent arg0) 
-	{ }
-
-	@Override
-	public void windowDeiconified(WindowEvent arg0)
-	{ }
-
-	@Override
-	public void windowIconified(WindowEvent arg0) 
-	{ }
-
-	@Override
-	public void windowOpened(WindowEvent arg0) 
-	{
-		if(droidDrowFrame.isVisible())
-			this.droidDrowFrame.setVisible(false);
-	}
-			
+	}			
 }

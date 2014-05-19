@@ -19,7 +19,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -108,7 +110,6 @@ public class PresentationServer implements WindowListener
 		} 
 		catch (IOException e) 
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -122,13 +123,18 @@ public class PresentationServer implements WindowListener
 		upperPanel.setBounds((int)dim.getWidth(), (int)dim.getHeight(), 600, 300);
 		upperPanel.setBackground(new Color(0, 0, 0, 50));
 		
-		output = new JTextArea(30, 20);
-		output.setBounds(10, 10, 580, 280);
+		output = new JTextArea();
 		output.setFont(font);
-		output.setEditable(false);
 		output.setForeground(Color.blue);
+		output.setEditable(false);
 		
-		upperPanel.add(output);
+		JScrollPane jp=new JScrollPane(output);
+		jp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		jp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		jp.setBounds(10, 10, 580, 280);
+		
+		
+		upperPanel.add(jp);
 		
 		
 		dim = new ScreenHandler().getCentredWindowsLocation(width, height, 800, 500);
@@ -156,7 +162,7 @@ public class PresentationServer implements WindowListener
     
     private void startServer()
     {
-    	net = new Networking(jf, PORT);
+    	net = new Networking(jf, PORT, this);
 		thread = new Thread(net);
 		thread.start();
     }
@@ -198,7 +204,7 @@ public class PresentationServer implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				new PresentationCreator(jf);
+				new PresentationCreator();
 			}
 		});
     	
@@ -248,5 +254,7 @@ public class PresentationServer implements WindowListener
 
 	@Override
 	public void windowOpened(WindowEvent e) 
-	{}     
+	{
+		start.doClick();
+	}     
 }

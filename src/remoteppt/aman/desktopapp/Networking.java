@@ -19,11 +19,13 @@ class Networking implements Runnable
     private JFrame frame;
     public Send send;
     public Receive receive;
+    private PresentationServer server;
     
-    Networking(JFrame frame, int port)
+    Networking(JFrame frame, int port, PresentationServer server)
     {
     	this.frame = frame;
     	this.PORT  = port; 
+    	this.server = server;
     }
     
     public void run()
@@ -39,7 +41,7 @@ class Networking implements Runnable
     				throw new InterruptedException();
     			}
     			this.sock = sersock.accept();
-		
+    			server.setText("Client Connected");
     			send = new Send(sock);
     			receive = new Receive(sock, send);
     			
@@ -73,6 +75,10 @@ class Networking implements Runnable
 		catch (IOException e) 
 		{
 			e.printStackTrace();
+		}
+		catch(NullPointerException ex)
+		{
+			frame.dispose();
 		}
 	}
 }
