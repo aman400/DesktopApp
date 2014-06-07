@@ -257,7 +257,7 @@ public class PresentationCreator
 			@Override
 			public void actionPerformed(ActionEvent event) 
 			{
-				JFileChooser fileChooser = new JFileChooser("/media/aman");
+				JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("images", "jpg", "png", "jpeg", "ico", "pdf", "gif");
 				fileChooser.setFileFilter(filter);
 				
@@ -291,6 +291,7 @@ public class PresentationCreator
 						{
 							fileList.remove(index);
 							fileList.add(index - 1, file);
+							table.setRowSelectionInterval(index - 1, index - 1);
 							tableModel.fireTableDataChanged();
 						}
 						else
@@ -409,6 +410,12 @@ public class PresentationCreator
 
 			private static final long serialVersionUID = 1L;
 
+			@Override
+			public boolean isCellEditable(int row, int column) 
+			{
+				return false;
+			}
+			
 			@Override
 			public int getColumnCount() 
 			{
