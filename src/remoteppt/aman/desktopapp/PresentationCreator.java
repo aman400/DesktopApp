@@ -291,8 +291,8 @@ public class PresentationCreator
 						{
 							fileList.remove(index);
 							fileList.add(index - 1, file);
-							table.setRowSelectionInterval(index - 1, index - 1);
 							tableModel.fireTableDataChanged();
+							table.setRowSelectionInterval(index - 1, index - 1);
 						}
 						else
 							throw new Exception();
@@ -327,6 +327,7 @@ public class PresentationCreator
 							fileList.remove(index);
 							fileList.add(index + 1, file);
 							tableModel.fireTableDataChanged();
+							table.setRowSelectionInterval(index + 1, index + 1);
 						}
 						else
 						{
