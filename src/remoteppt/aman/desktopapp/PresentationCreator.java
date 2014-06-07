@@ -258,18 +258,22 @@ public class PresentationCreator
 			public void actionPerformed(ActionEvent event) 
 			{
 				JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
+				fileChooser.setMultiSelectionEnabled(true);
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("images", "jpg", "png", "jpeg", "ico", "pdf", "gif");
 				fileChooser.setFileFilter(filter);
 				
 				int returnValue = fileChooser.showOpenDialog(frame);
 				if(returnValue == JFileChooser.APPROVE_OPTION)
 				{
-					choosedFilePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
-					FileHandler newFile = new FileHandler(fileChooser.getSelectedFile().getName(),fileChooser.getSelectedFile().getAbsolutePath());
-					fileList.add(newFile);
-					tableModel.fireTableDataChanged();
-					viewImage(newFile.getFilePath());
-					
+					File[] filesChoosen = fileChooser.getSelectedFiles();
+					for(File singleFile : filesChoosen)
+					{
+						choosedFilePath.setText(singleFile.getAbsolutePath());
+						FileHandler newFile = new FileHandler(singleFile.getName(),singleFile.getAbsolutePath());
+						fileList.add(newFile);
+						tableModel.fireTableDataChanged();
+						viewImage(newFile.getFilePath());
+					}					
 				}
 			}
 			
