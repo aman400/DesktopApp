@@ -123,7 +123,6 @@ public class Receive implements Runnable
 				else if(msg.equals("$$IP&HOST$$"))
 				{
 					send.sendMessage("$$IP&HOST$$");
-					send.sendMessage(InetAddress.getLocalHost().getHostAddress());
 					send.sendMessage(InetAddress.getLocalHost().getHostName());
 				}
 				
